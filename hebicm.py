@@ -17,7 +17,7 @@ class Hebi(commands.Cog):
         self._ask: str = 'ask'
         self._answer: str = 'answer'
         self._command: str = 'command'
-        self._csv_file: str = "./hebi.csv"
+        self._csv_file: str = "../data/hebi.csv"
         self.bot = bot
         self._df: pd.DataFrame = None
 

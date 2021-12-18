@@ -29,9 +29,9 @@ class HebiListener(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        local_dir: str = '/home/user/httpd/web/discord/img/nsfw/'
-        test_local_dir: str = '/home/user/discord-bot/temp/'
-        temp_file: str = '/home/user/discord-bot/~test.obj'
+        local_dir: str = '../data/nsfw/'
+        test_local_dir: str = './temp/'
+        temp_file: str = './~test.obj'
         playlist_dir: str = '/home/user/Musicbot/Playlists/'
         nsfw_channel_id: int = 317650564869521408
         test_channel_id: int = 317891419547369492
