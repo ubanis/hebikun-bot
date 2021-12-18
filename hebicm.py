@@ -17,7 +17,7 @@ class Hebi(commands.Cog):
         self._ask: str = 'ask'
         self._answer: str = 'answer'
         self._command: str = 'command'
-        self._csv_file: str = "/home/user/btsync/hebi.csv"
+        self._csv_file: str = "./hebi.csv"
         self.bot = bot
         self._df: pd.DataFrame = None
 
@@ -435,7 +435,7 @@ class Hebi(commands.Cog):
 
         content = {'image/jpeg': 'jpg',
                   'image/png': 'png', 'image/gif': 'gif'}
-        temp_file = '/home/user/discord-bot/open_url.temp'
+        temp_file = './open_url.temp'
 
         if not await util.download_file(mob.group(1), temp_file, content):
             return False
