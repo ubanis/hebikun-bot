@@ -32,22 +32,32 @@ class HebiListener(commands.Cog):
         local_dir: str = './upload/'
         test_local_dir: str = './temp/'
         temp_file: str = './~test.obj'
+        """
+        temp_file2: str = '/home/user/discord-bot/~test2.obj'
+        sfw_dir: str = '/home/user/httpd/web/discord/img/sfw/'
+        """
         playlist_dir: str = '/home/user/Musicbot/Playlists/'
         nsfw_channel_id: int = 317650564869521408
         test_channel_id: int = 317891419547369492
         bot_channel_id: int = 583000685688258594
+        sfw_channel_id: int = 780097702921895956
         # general_channel_id = 317649332125827072
 
         if message.author.bot:
             return
         elif message.channel.id == nsfw_channel_id:
             await self.gallery_image_download(message, local_dir, temp_file,
-                                              False)
+                                              False,'discord-nsfw2-')
         elif message.channel.id == bot_channel_id:
             await self.text_download(message, playlist_dir, True)
         elif message.channel.id == test_channel_id:
             await self.gallery_image_download(message, test_local_dir,
                                               temp_file, True)
+        """
+        elif message.channel.id == sfw_channel_id:
+            await self.gallery_image_download(message, sfw_dir, temp_file2,
+                                              'discord-sfw-',False)
+        """
 
     async def text_download(self, message, target_dir, istest=True):
         success_message: str = 'MESSAGE: text added to MusicBot Playlists -> '
@@ -75,7 +85,8 @@ class HebiListener(commands.Cog):
                                      message,
                                      target_dir,
                                      temp_file='~temp.tmp',
-                                     istest=True):
+                                     istest=True,
+                                     header='HEADER-'):
         """Discord NSFW Gallery image upload
 
         Args:
@@ -83,10 +94,10 @@ class HebiListener(commands.Cog):
             target_dir (str): save to gallery path
             temp_file (str): download temp filename or file path
             istest (bool): test mode enable or deisable
+            header (str): upload fileimage header ex) (Header)000001.jpg
         """
-        success_message: str = 'MESSAGE: image added to gallery -> '
+        success_message: str = 'MESSAGE: image added to gallery-> '
         not_image_message: str = 'ERROR: File type is not image'
-        header: str = 'discord-'
         content = {'image/jpeg': 'jpg',
                    'image/png': 'png', 'image/gif': 'gif'}
         regex = r"(https?|ftp)(:\/\/[-_\.!~*\'()a-zA-Z0-9;\/?:\@&=\+\$,%#]+)"
@@ -158,3 +169,4 @@ class HebiListener(commands.Cog):
                 emoji = discord.utils.get(self.bot.emojis, name='hebi')
                 if emoji:
                     await message.add_reaction(emoji)
+
