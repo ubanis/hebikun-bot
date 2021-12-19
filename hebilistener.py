@@ -29,7 +29,7 @@ class HebiListener(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        local_dir: str = '../data/nsfw/'
+        local_dir: str = './upload/'
         test_local_dir: str = './temp/'
         temp_file: str = './~test.obj'
         playlist_dir: str = '/home/user/Musicbot/Playlists/'
