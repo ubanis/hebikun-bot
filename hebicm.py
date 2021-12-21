@@ -1,7 +1,7 @@
 import pathlib
 import imghdr
 from typing import List
-
+from typing import Union
 import discord
 from discord.ext import commands
 import os
@@ -10,6 +10,7 @@ import asyncio
 import aiohttp
 import pandas as pd
 import util
+
 
 
 class Hebi(commands.Cog):
@@ -25,16 +26,16 @@ class Hebi(commands.Cog):
         self.load_csv()
         self.set_hebi_commands()
 
-        self._timeout_message = self._df.at['@timeout_message', self._answer]
-        self._what_message = self._df.at['@what_message', self._answer]
-        self._learn_message = self._df.at['@learn_message', self._answer]
-        self._bot_setmes_help_message = self._df.at['@setmes_help_message',
+        self._timeout_message: str = self._df.at['@timeout_message', self._answer]
+        self._what_message: str = self._df.at['@what_message', self._answer]
+        self._learn_message: str = self._df.at['@learn_message', self._answer]
+        self._bot_setmes_help_message: str = self._df.at['@setmes_help_message',
                                                     self._answer]
-        self._chmes_success_message = self._df.at['@chmes_success_message',
+        self._chmes_success_message: str = self._df.at['@chmes_success_message',
                                                   self._answer]
-        self._chmes_fail_message = self._df.at['@chmes_fail_message', self.
+        self._chmes_fail_message: str = self._df.at['@chmes_fail_message', self.
                                                _answer]
-        self._unknown_message = self._df.at['@unknown_command_message', self.
+        self._unknown_message: str = self._df.at['@unknown_command_message', self.
                                             _answer]
 
     def load_csv(self):
@@ -99,7 +100,7 @@ class Hebi(commands.Cog):
             }
         }
 
-    def get_command(self, command_str: str):
+    def get_command(self, command_str: str) -> Union[dict,None]:
         """get a command dict from self.hebi_commands
 
         Args:
@@ -357,7 +358,7 @@ class Hebi(commands.Cog):
         """
         command_error_message: str = 'HEBI_ERROR: hebi command error'
 
-        command: dict = self.get_command(command_str)
+        command: Union[dict,None] = self.get_command(command_str)
         if command is None:
             print(command_error_message)
             return False
@@ -440,7 +441,7 @@ class Hebi(commands.Cog):
         if not await util.download_file(mob.group(1), temp_file, content):
             return False
 
-        image_type: str = imghdr.what(temp_file)
+        image_type: Union[str,None] = imghdr.what(temp_file)
         if image_type is None:
             return False
 
