@@ -370,6 +370,7 @@ class Hebi(commands.Cog):
         """
         command_error_message: str = 'HEBI_ERROR: hebi command error'
 
+        print(command_str)
         try:
             idx:int=list(map(lambda x:x.name, self.command_list)).index(command_str)
         except ValueError:
