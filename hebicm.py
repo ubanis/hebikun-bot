@@ -11,7 +11,37 @@ import aiohttp
 import pandas as pd
 import util
 
-
+class HebiCommand:
+    """ hebi command class
+    """
+    def __init__(self,name:str,
+                     pattern:str,
+                     function,
+                     desc:str):
+        self.__name: str = name
+        self.__pattern: str = pattern
+        self.__function = function
+        self.__description: str = desc
+    @property
+    def name(self) -> str:
+        """ command name
+        """
+        return self.__name
+    @property
+    def pattern(self) -> str:
+        """ command matching pattern
+        """
+        return self.__pattern
+    @property
+    def function(self):
+        """ command method pointer
+        """
+        return self.__function
+    @property
+    def description(self) -> str:
+        """ command description
+        """
+        return self.__description
 
 class Hebi(commands.Cog):
     def __init__(self, bot):
@@ -22,7 +52,7 @@ class Hebi(commands.Cog):
         self.bot = bot
         self._df: pd.DataFrame = None
 
-        self._hebi_commands: dict = {}
+        self.command_list = []
         self.load_csv()
         self.set_hebi_commands()
 
@@ -55,52 +85,32 @@ class Hebi(commands.Cog):
     def set_hebi_commands(self):
         """set self.hebi_commands dict
         """
-        self._hebi_commands = {
-            'base_command': {
-                'pattern': r'(.*)\(.*\)',
-                'function': None,
-                'description': 'このコマンドは利用できません'
-            },
-            'send_file': {
-                'pattern':
-                r'send_file\(\"(.*)\"\)',
-                'function':
-                self.bot_command_send_file,
-                'description':
-                '[send_file ファイルパス] ローカル用コマンドなので \
-                                !setmes ではファイルを指定できません'
-            },
-            'open_url_image': {
-                'pattern':
-                r'open_url_image\(\"(.*)\"\)',
-                'function':
-                self.bot_command_open_url_image,
-                'description':
-                '[open_url_image 画像のURL] 指定されたURLの画像を\
-                                メッセージの後貼り付けます'
-            },
-            'send_url': {
-                'pattern':
-                r'send_url\(\"(.*)\"\)',
-                'function':
-                self.bot_command_send_url,
-                'description':
-                '[send_url 指定URL] 指定されたURLを\
-                                メッセージの後貼り付けます'
-            },
-            'weather': {
-                'pattern':
-                r'weather\(\"(.*)\"\)',
-                'function':
-                self.bot_command_weather,
-                'description':
-                '[weather 都市コード] 指定コードの天気を貼り付けます\
-                    　コードはこちらで確認してください。\
-                    http://weather.livedoor.com/forecast/rss/primary_area.xml'
-            }
-        }
+        self.command_list = [
+                HebiCommand("base_command",r'(.*)\(.*\)',None,"このコマンドは利用できません"),
+                HebiCommand("send_file",
+                            r'send_file\(\"(.*)\"\)',
+                            self.bot_command_send_file,
+                            "[send_file ファイルパス] ローカル用コマンドなので \
+                            !setmes ではファイルを指定できませんdesc-grandy"),
+                HebiCommand("open_url_image",
+                            r'open_url_image\(\"(.*)\"\)',
+                            self.bot_command_open_url_image,
+                            "[open_url_image 画像のURL] 指定されたURLの画像を\
+                            メッセージの後貼り付けます"),
+                HebiCommand("send_url",
+                            r'send_url\(\"(.*)\"\)',
+                            self.bot_command_send_url,
+                            "[send_url 指定URL] 指定されたURLを\
+                            メッセージの後貼り付けます"),
+                HebiCommand("weather",
+                            r'weather\(\"(.*)\"\)',
+                            self.bot_command_weather,
+                            "[weather 都市コード] 指定コードの天気を貼り付けます\
+                            　コードはこちらで確認してください。\
+                            http://weather.livedoor.com/forecast/rss/primary_area.xmldesc-kyle")
+            ]
 
-    def get_command(self, command_str: str) -> Union[dict,None]:
+    def get_command(self, command_str: str) -> Union[None,HebiCommand]:
         """get a command dict from self.hebi_commands
 
         Args:
@@ -109,15 +119,16 @@ class Hebi(commands.Cog):
         Returns:
             dict: one command dict or None
         """
-        m = re.search(
-            self._hebi_commands.get('base_command', {}).get('pattern'),
-            command_str)
+        m = re.search( self.command_list[0].pattern,command_str)
         if m is None:
             return None
         command_name = m.group(1)
         if command_name not in self._hebi_commands:
             return None
-        return self._hebi_commands[command_name]
+        for l in self.command_list:
+            if l.name == command_name:
+                return l
+        return None 
 
     @commands.command()
     async def help(self, ctx):
@@ -168,10 +179,11 @@ class Hebi(commands.Cog):
         dm_user = self.bot.get_user(ctx.message.author.id)
         dm = await dm_user.create_dm()
         embed = discord.Embed(title='メッセージで使えるコマンド一覧', color=0x26de12)
-        for d in self._hebi_commands:
+
+        for l in self.command_list:
             embed.add_field(
-                name=d,
-                value=self._hebi_commands[d]['description'],
+                name=l.name,
+                value=l.description,
                 inline=False)
         await dm.send(content=None, embed=embed)
 
@@ -358,18 +370,22 @@ class Hebi(commands.Cog):
         """
         command_error_message: str = 'HEBI_ERROR: hebi command error'
 
-        command: Union[dict,None] = self.get_command(command_str)
-        if command is None:
-            print(command_error_message)
-            return False
-
-        mob = re.search(command.get('pattern'), command_str)
-        if mob is None:
-            print(command_error_message)
-            return False
-
         try:
-            is_success = await command['function'](ctx, mob)
+            idx:int=list(map(lambda x:x.name, self.command_list)).index(command_str)
+        except ValueError:
+            print(command_error_message)
+            return False
+        command2: HebiCommand = self.command_list[idx]
+
+        if command2 is None:
+            print(command_error_message)
+            return False
+        mob2 = re.search(command2.pattern, command_str)
+        if mob2 is None:
+            print(command_error_message)
+            return False
+        try:
+            is_success = await command2.function(ctx, mob2)
         except KeyError as e:
             print(e)
             return False
