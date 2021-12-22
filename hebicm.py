@@ -123,7 +123,6 @@ class Hebi(commands.Cog):
         if m is None:
             return None
         command_name = m.group(1)
-        print(command_name)
         for l in self.command_list:
             if l.name == command_name:
                 return l
