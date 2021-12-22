@@ -123,8 +123,7 @@ class Hebi(commands.Cog):
         if m is None:
             return None
         command_name = m.group(1)
-        if command_name not in self._hebi_commands:
-            return None
+        print(command_name)
         for l in self.command_list:
             if l.name == command_name:
                 return l
@@ -370,14 +369,11 @@ class Hebi(commands.Cog):
         """
         command_error_message: str = 'HEBI_ERROR: hebi command error'
 
-        print(command_str)
         try:
-            idx:int=list(map(lambda x:x.name, self.command_list)).index(command_str)
+            command2:Union[HebiCommand,None] = self.get_command(command_str)
         except ValueError:
             print(command_error_message)
             return False
-        command2: HebiCommand = self.command_list[idx]
-
         if command2 is None:
             print(command_error_message)
             return False
