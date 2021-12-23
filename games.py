@@ -5,7 +5,6 @@ import random
 import asyncio
 import dice
 
-
 class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -19,25 +18,24 @@ class Games(commands.Cog):
 
     @commands.command()
     async def nkodice(self, ctx):
-        nkodice: List[str] = ['う', 'お', 'こ', 'ち', 'ま', 'ん']
-        currentdice = nkodice
-        choice:str =""
-        result:str =""
-        outmessage:str =""
-        total:int = 0
-        addroll:int = 0
-        rollcount:int = 0
-        dicenum:int=5
-        yaku:int=0
-        upoint:int=0
-        mpoint:int=0
-        cpoint:int=0
-        udouble:float=1
-        mdouble:float=1
-        cdouble:float=1
-        totalu:float=0
-        totalm:float=0
-        totalc:float=0
+        nkodice: List[str] = ["う", "お", "こ", "ち", "ま", "ん"]
+        current_dice = nkodice
+        choice: str = ""
+        result: str = ""
+        out_message: str = ""
+        add_roll: int = 0
+        roll_count: int = 0
+        dice_num: int = 5
+        yaku: int = 0
+        u_point: int = 0
+        m_point: int = 0
+        c_point: int =0
+        u_double: float = 1
+        m_double: float = 1
+        c_double: float = 1
+        total_u: float = 0
+        total_m: float = 0
+        total_c: float = 0
         unchi_flag_now = False
         unko_flag_now = False
         manko_flag_now = False
@@ -45,295 +43,313 @@ class Games(commands.Cog):
         chinko_flag_now = False
         chinchin_flag_now = False
         ochinchin_flag_now = False
-        unko_combo = 0
-        unchi_combo = 0
-        manko_combo = 0
-        omanko_combo = 0
-        chinko_combo = 0
-        chinchin_combo = 0
-        ochinchin_combo = 0
-        p:int=0
-        u=o=ko=chi=ma=n=0
-        roll:int=3
-        round:int=0
+        unko_combo: int = 0
+        unchi_combo: int = 0
+        manko_combo: int = 0
+        omanko_combo: int = 0
+        chinko_combo: int = 0
+        chinchin_combo: int = 0
+        ochinchin_combo: int = 0
+        combo_bonus: int = 0
+        dice_u = dice_o = dice_ko = dice_chi = dice_ma = dice_n = 0
+        roll: int = 3
+        round: int = 0
+        ochinchin_str: str = " :regional_indicator_o: \
+:regional_indicator_c: :regional_indicator_h: :regional_indicator_i: \
+:regional_indicator_n:  :regional_indicator_c: :regional_indicator_h: \
+:regional_indicator_i: :regional_indicator_n: "
 
-        while rollcount < roll:
+        while roll_count < roll:
             round += 1
             result += str(round) + ": "
-            for i in range(dicenum):
-                choice = random.choice(currentdice)
+            for i in range(dice_num):
+                choice = random.choice(current_dice)
                 result += choice
 
-            u=result.count('う')
-            o=result.count('お')
-            ko=result.count('こ')
-            chi=result.count('ち')
-            ma=result.count('ま')
-            n=result.count('ん')
+            dice_u = result.count("う")
+            dice_o = result.count("お")
+            dice_ko = result.count("こ")
+            dice_chi = result.count("ち")
+            dice_ma = result.count("ま")
+            dice_n = result.count("ん")
 
-            for i in range(u):
-                upoint += 500
-            for i in range(ma):
-                mpoint += 500
-            for i in range(chi):
-                cpoint += 500
-            for i in range(n):
-                upoint += 50
-                mpoint += 50
-                cpoint += 50
-            for i in range(ko):
-                upoint += 100
-                mpoint += 100
-                cpoint += 100
-            for i in range(o):
-                upoint += 300
-                mpoint += 300
-                cpoint += 300
+            u_point += 500 * dice_u
+            m_point += 500 * dice_ma
+            c_point += 500 * dice_chi
+            u_point += 50 * dice_n
+            m_point += 50 * dice_n
+            c_point += 50 * dice_n
+            u_point += 100 * dice_ko
+            m_point += 100 * dice_ko
+            c_point += 100 * dice_ko
+            u_point += 300 * dice_o
+            m_point += 300 * dice_o
+            c_point += 300 * dice_o
 
-            if(u>=5):
-                udouble = 4
-            elif(u>=4):
-                udouble = 3
-            elif(u>=3):
-                udouble = 2
+            if dice_u >= 5:
+                u_double = 4
+            elif dice_u >= 4:
+                u_double = 3
+            elif dice_u >= 3:
+                u_double = 2
 
-            if(ma>=5):
-                mdouble = 4
-            elif(ma>=4):
-                mdouble = 3
-            elif(ma>=3):
-                mdouble = 2
+            if dice_ma >= 5:
+                m_double = 4
+            elif dice_ma >= 4:
+                m_double = 3
+            elif dice_ma >= 3:
+                m_double = 2
 
-            if(chi>=5):
-                cdouble = 4
-            elif(chi>=4):
-                cdouble = 3
-            elif(chi>=3):
-                cdouble = 2
+            if dice_chi >= 5:
+                c_double = 4
+            elif dice_chi >= 4:
+                c_double = 3
+            elif dice_chi >= 3:
+                c_double = 2
 
-            if(n>=4):
-                udouble = -4
-                mdouble = -4
-                cdouble = -4
-            elif(n>=3):
-                udouble = -3
-                mdouble = -3
-                cdouble = -3
+            if dice_n >= 4:
+                u_double = m_double = c_double = -4
+            elif dice_n >= 3:
+                u_double = m_double = c_double = -3
 
-            if(ko>=6):
-                udouble = 4
-                mdouble = 4
-                cdouble = 4
-            elif(ko>=5):
-                udouble = 3.5
-                mdouble = 3.5
-                cdouble = 3.5
-            elif(ko>=4):
-                udouble = 2.5
-                mdouble = 2.5
-                cdouble = 2.5
-            elif(ko>=3):
-                udouble = 1.5
-                mdouble = 1.5
-                cdouble = 1.5
+            if dice_ko >= 6:
+                u_double = m_double = c_double = 4
+            elif dice_ko >= 5:
+                u_double = m_double = c_double = 3.5
+            elif dice_ko >= 4:
+                u_double = m_double = c_double = 2.5
+            elif dice_ko >= 3:
+                u_double = m_double = c_double = 1.5
 
-            if(o>=3):
-                if(totalu<0):
-                    totalu = -totalu
-                if(totalm<0):
-                    totalm = -totalm
-                if(totalc<0):
-                    totalc = -totalc
+            if dice_o >= 3:
+                if total_u < 0:
+                    total_u = -total_u
+                if total_m < 0:
+                    total_m = -total_m
+                if total_c < 0:
+                    total_c = -total_c
 
-            if(o>=6):
-                udouble = 4
-                mdouble = 4
-                cdouble = 4
-            elif(o>=5):
-                udouble = 3.5
-                mdouble = 3.5
-                cdouble = 3.5
-            elif(o>=4):
-                udouble = 2.5
-                mdouble = 2.5
-                cdouble = 2.5
-            elif(o>=3):
-                udouble = 1.5
-                mdouble = 1.5
-                cdouble = 1.5
+            if dice_o >= 6:
+                u_double = 4
+                m_double = 4
+                c_double = 4
+            elif dice_o >= 5:
+                u_double = 3.5
+                m_double = 3.5
+                c_double = 3.5
+            elif dice_o >= 4:
+                u_double = 2.5
+                m_double = 2.5
+                c_double = 2.5
+            elif dice_o >= 3:
+                u_double = 1.5
+                m_double = 1.5
+                c_double = 1.5
 
-            if all([u>=1,n>=1,ko>=1]):
+            if all([dice_u >= 1, dice_n >= 1, dice_ko >= 1]):
                 result += " **U N K O** "
                 unko_flag_now = True
                 unko_combo += 1
-                if(unko_combo == 2):
-                    p = 2000
+                if unko_combo == 2:
+                    combo_bonus = 2000
                     result += "*(x2)* "
-                elif(unko_combo == 3):
-                    p = 4000
+                elif unko_combo == 3:
+                    combo_bonus = 4000
                     result += "*(x4)* "
-                elif(unko_combo >= 4):
-                    p = 8000
+                elif unko_combo >= 4:
+                    combo_bonus = 8000
                     result += "*(x8)* "
                 else:
-                    p = 1000
-                upoint += p
-                addroll = 1
-                yaku+=1
+                    combo_bonus = 1000
+                u_point += combo_bonus
+                add_roll = 1
+                yaku += 1
 
-            if all([u>=1,n>=1,chi>=1]):
+            if all([dice_u >= 1, dice_n >= 1, dice_chi >= 1]):
                 result += " **U N C H I** "
                 unchi_flag_now = True
                 unchi_combo += 1
-                if(unchi_combo == 2):
-                    p = 2000
+                if unchi_combo == 2:
+                    combo_bonus = 2000
                     result += "*(x2)* "
-                elif(unchi_combo == 3):
-                    p = 4000
+                elif unchi_combo == 3:
+                    combo_bonus = 4000
                     result += "*(x4)* "
-                elif(unchi_combo >= 4):
-                    p = 8000
+                elif unchi_combo >= 4:
+                    combo_bonus = 8000
                     result += "*(x8)* "
                 else:
-                    p = 1000
-                upoint += p
-                addroll = 1
-                yaku+=1
+                    combo_bonus = 1000
+                u_point += combo_bonus
+                add_roll = 1
+                yaku += 1
 
-            if all([ma>=1,n>=1,ko>=1]):
+            if all([dice_ma >= 1, dice_n >= 1, dice_ko >= 1]):
                 result += " **M A N K O** "
                 manko_flag_now = True
                 manko_combo += 1
-                if(manko_combo == 2):
-                    p = 2000
+                if manko_combo == 2:
+                    combo_bonus = 2000
                     result += "*(x2)* "
-                elif(manko_combo == 3):
-                    p = 4000
+                elif manko_combo == 3:
+                    combo_bonus = 4000
                     result += "*(x4)* "
-                elif(manko_combo >= 4):
-                    p = 8000
+                elif manko_combo >= 4:
+                    combo_bonus = 8000
                     result += "*(x8)* "
                 else:
-                    p = 1000
-                mpoint += p
-                addroll = 1
-                yaku+=1
+                    combo_bonus = 1000
+                m_point += combo_bonus
+                add_roll = 1
+                yaku += 1
 
-            if all([ma>=1 , n>=1 , ko>=1 , o>=1]):
+            if all([dice_ma >= 1, dice_n >= 1, dice_ko >= 1, dice_o >= 1]):
                 result += " **O M A N K O** "
                 omanko_flag_now = True
                 omanko_combo += 1
-                if(omanko_combo == 2):
-                    p = 10000
+                if omanko_combo == 2:
+                    combo_bonus = 10000
                     result += "*(x2)* "
-                elif(omanko_combo == 3):
-                    p = 20000
+                elif omanko_combo == 3:
+                    combo_bonus = 20000
                     result += "*(x4)* "
-                elif(omanko_combo >= 4):
-                    p = 40000
+                elif omanko_combo >= 4:
+                    combo_bonus = 40000
                     result += "*(x8)* "
                 else:
-                    p = 5000
-                mpoint += p
-                addroll = 1
-                yaku+=1
+                    combo_bonus = 5000
+                m_point += combo_bonus
+                add_roll = 1
+                yaku += 1
 
-            if all([chi>=1 , n>=1 , ko>=1]):
+            if all([dice_chi >= 1, dice_n >= 1, dice_ko >= 1]):
                 result += " **C H I N K O** "
                 chinko_flag_now = True
                 chinko_combo += 1
-                if(chinko_combo == 2):
-                    p = 2000
+                if chinko_combo == 2:
+                    combo_bonus = 2000
                     result += "*(x2)* "
-                elif(chinko_combo == 3):
-                    p = 4000
+                elif chinko_combo == 3:
+                    combo_bonus = 4000
                     result += "*(x4)* "
-                elif(chinko_combo >= 4):
-                    p = 8000
+                elif chinko_combo >= 4:
+                    combo_bonus = 8000
                     result += "*(x8)* "
                 else:
-                    p = 1000
-                cpoint += p
-                addroll = 1
-                yaku+=1
+                    combo_bonus = 1000
+                c_point += combo_bonus
+                add_roll = 1
+                yaku += 1
 
-            if all([chi>=2 , n>=2]):
+            if all([dice_chi >= 2, dice_n >= 2]):
                 result += " **C H I N C H I N** "
                 chinchin_flag_now = True
                 chinchin_combo += 1
-                if(chinchin_combo == 2):
-                    p = 6000
+                if chinchin_combo == 2:
+                    combo_bonus = 6000
                     result += "*(x2)* "
-                elif(chinchin_combo == 3):
-                    p = 12000
+                elif chinchin_combo == 3:
+                    combo_bonus = 12000
                     result += "*(x3)* "
-                elif(chinchin_combo >= 4):
-                    p = 24000
+                elif chinchin_combo >= 4:
+                    combo_bonus = 24000
                     result += "*(x8)* "
                 else:
-                    p = 3000
-                cpoint += p
-                addroll = 1
-                yaku+=1
+                    combo_bonus = 3000
+                c_point += combo_bonus
+                add_roll = 1
+                yaku += 1
 
-            if all([o>=1 , chi>=2 , n>=2]):
-                result += " :regional_indicator_o: :regional_indicator_c: :regional_indicator_h: :regional_indicator_i: :regional_indicator_n:  :regional_indicator_c: :regional_indicator_h: :regional_indicator_i: :regional_indicator_n: "
+            if all([dice_o >= 1, dice_chi >= 2, dice_n >= 2]):
+                result += ochinchin_str
                 ochinchin_flag_now = True
                 ochinchin_combo += 1
-                if(ochinchin_combo == 2):
-                    p = 20000
+                if ochinchin_combo == 2:
+                    combo_bonus = 20000
                     result += "*(x2)* "
-                elif(ochinchin_combo == 3):
-                    p = 40000
+                elif ochinchin_combo == 3:
+                    combo_bonus = 40000
                     result += "*(x4)* "
-                elif(ochinchin_combo >= 4):
-                    p = 80000
+                elif ochinchin_combo >= 4:
+                    combo_bonus = 80000
                     result += "*(x8)* "
                 else:
-                    p = 10000
-                cpoint += p
-                addroll = 1
-                yaku=-1000
-            dicenum = 5
-            if(yaku >= 2):
-                dicenum += yaku-1
-            elif(yaku == -1000):
-                dicenum = 10
+                    combo_bonus = 10000
+                c_point += combo_bonus
+                add_roll = 1
+                yaku = -1000
+            dice_num = 5
+            if yaku >= 2:
+                dice_num += yaku - 1
+            elif yaku == -1000:
+                dice_num = 10
 
-            if(unchi_combo >= 1 and unchi_flag_now == False):
+            if unchi_combo >= 1 and unchi_flag_now == False:
                 unchi_combo = 0
-            if(unko_combo >= 1 and unko_flag_now == False):
+            if unko_combo >= 1 and unko_flag_now == False:
                 unko_combo = 0
-            if(manko_combo >= 1 and manko_flag_now == False):
+            if manko_combo >= 1 and manko_flag_now == False:
                 manko_combo = 0
-            if(omanko_combo >= 1 and omanko_flag_now == False):
+            if omanko_combo >= 1 and omanko_flag_now == False:
                 omanko_combo = 0
-            if(chinko_combo >= 1 and chinko_flag_now == False):
+            if chinko_combo >= 1 and chinko_flag_now == False:
                 chinko_combo = 0
-            if(chinchin_combo >= 1 and chinchin_flag_now == False):
+            if chinchin_combo >= 1 and chinchin_flag_now == False:
                 chinchin_combo = 0
-            if(ochinchin_combo >= 1 and ochinchin_flag_now == False):
+            if ochinchin_combo >= 1 and ochinchin_flag_now == False:
                 ochinchin_combo = 0
 
-            unchi_flag_now = unko_flag_now = manko_flag_now = omanko_flag_now = chinko_flag_now = chinchin_flag_now = ochinchin_flag_now = False
-            totalu += upoint
-            totalm += mpoint
-            totalc += cpoint
-            totalu *= udouble
-            totalm *= mdouble
-            totalc *= cdouble
-            result += " U: " + str(totalu) + " (x" + str(udouble) + ")" + " M: " + str(totalm) + " (x" + str(mdouble) + ")"  +  " C: " + str(totalc) + " (x" + str(cdouble) + ")\n"
-            outmessage += result
-            rollcount += 1
-            rollcount -= addroll
-            udouble = mdouble = cdouble = 1
-            upoint = mpoint = cpoint = 0
-            yaku=0
-            addroll = 0
-            result=""
-        outmessage += "\nU: " + str(totalu) + " M: " + str(totalm) + " C: " + str(totalc) + "\n合計点数 **" + str(totalu+totalm+totalc) + " 点**\n"
+            unchi_flag_now = (
+                unko_flag_now
+            ) = (
+                manko_flag_now
+            ) = (
+                omanko_flag_now
+            ) = chinko_flag_now = chinchin_flag_now = ochinchin_flag_now = False
+            total_u += u_point
+            total_m += m_point
+            total_c += c_point
+            total_u *= u_double
+            total_m *= m_double
+            total_c *= c_double
+            result += (
+                " U: "
+                + str(total_u)
+                + " (x"
+                + str(u_double)
+                + ")"
+                + " M: "
+                + str(total_m)
+                + " (x"
+                + str(m_double)
+                + ")"
+                + " C: "
+                + str(total_c)
+                + " (x"
+                + str(c_double)
+                + ")\n"
+            )
+            out_message += result
+            roll_count += 1
+            roll_count -= add_roll
+            u_double = m_double = c_double = 1
+            u_point = m_point = c_point = 0
+            yaku = 0
+            add_roll = 0
+            result = ""
+        out_message += (
+            "\nU: "
+            + str(total_u)
+            + " M: "
+            + str(total_m)
+            + " C: "
+            + str(total_c)
+            + "\n合計点数 **"
+            + str(total_u + total_m + total_c)
+            + " 点**\n"
+        )
 
-        await ctx.send(outmessage)
+        await ctx.send(out_message)
 
     @commands.command()
     async def omikuji(self, ctx):
