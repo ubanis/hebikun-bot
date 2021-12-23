@@ -1,16 +1,22 @@
+import asyncio
+import random
 from typing import Dict, List
+
 from discord.ext import commands
 
-import random
-import asyncio
 import dice
 
+
 class Games(commands.Cog):
+    """
+    Hebi games commands class
+    """
+
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def d(self, ctx,message):
+    async def d(self, ctx, message):
         result = dice.nDn(message)
         if result is not None:
             await ctx.send(result)
@@ -29,7 +35,7 @@ class Games(commands.Cog):
         yaku: int = 0
         u_point: int = 0
         m_point: int = 0
-        c_point: int =0
+        c_point: int = 0
         u_double: float = 1
         m_double: float = 1
         c_double: float = 1
@@ -53,15 +59,15 @@ class Games(commands.Cog):
         combo_bonus: int = 0
         dice_u = dice_o = dice_ko = dice_chi = dice_ma = dice_n = 0
         roll: int = 3
-        round: int = 0
+        nko_round: int = 0
         ochinchin_str: str = " :regional_indicator_o: \
 :regional_indicator_c: :regional_indicator_h: :regional_indicator_i: \
 :regional_indicator_n:  :regional_indicator_c: :regional_indicator_h: \
 :regional_indicator_i: :regional_indicator_n: "
 
         while roll_count < roll:
-            round += 1
-            result += str(round) + ": "
+            nko_round += 1
+            result += str(nko_round) + ": "
             for i in range(dice_num):
                 choice = random.choice(current_dice)
                 result += choice
@@ -284,19 +290,19 @@ class Games(commands.Cog):
             elif yaku == -1000:
                 dice_num = 10
 
-            if unchi_combo >= 1 and unchi_flag_now == False:
+            if unchi_combo >= 1 and unchi_flag_now is False:
                 unchi_combo = 0
-            if unko_combo >= 1 and unko_flag_now == False:
+            if unko_combo >= 1 and unko_flag_now is False:
                 unko_combo = 0
-            if manko_combo >= 1 and manko_flag_now == False:
+            if manko_combo >= 1 and manko_flag_now is False:
                 manko_combo = 0
-            if omanko_combo >= 1 and omanko_flag_now == False:
+            if omanko_combo >= 1 and omanko_flag_now is False:
                 omanko_combo = 0
-            if chinko_combo >= 1 and chinko_flag_now == False:
+            if chinko_combo >= 1 and chinko_flag_now is False:
                 chinko_combo = 0
-            if chinchin_combo >= 1 and chinchin_flag_now == False:
+            if chinchin_combo >= 1 and chinchin_flag_now is False:
                 chinchin_combo = 0
-            if ochinchin_combo >= 1 and ochinchin_flag_now == False:
+            if ochinchin_combo >= 1 and ochinchin_flag_now is False:
                 ochinchin_combo = 0
 
             unchi_flag_now = (
@@ -366,15 +372,15 @@ class Games(commands.Cog):
         lv2 = {"偉い": "謝りました・・・（達成感）", "えらい": "謝りました・・・（達成感）"}
         lv3 = {
             "？": "でも細かいことを気にしすぎだよね、影響されやすいというか",
-            "ん？": "でも細かいことを気にしすぎだよね、影響されやすいというか"
+            "ん？": "でも細かいことを気にしすぎだよね、影響されやすいというか",
         }
         syamu_message: List[Dict[str, str]] = [lv1, lv2, lv3]
-        unsei: List[str] = ['大吉', '吉', '中吉', '小吉', '末吉', '凶', '大凶', '順平']
+        unsei: List[str] = ["大吉", "吉", "中吉", "小吉", "末吉", "凶", "大凶", "順平"]
         choice: str = random.choice(unsei)
 
-        await ctx.send('本日' + ctx.author.name + 'の運勢は' + choice)
-        if choice == '順平':
-            await ctx.send('やーい！\nお前の運勢シャムゲーム！')
+        await ctx.send("本日" + ctx.author.name + "の運勢は" + choice)
+        if choice == "順平":
+            await ctx.send("やーい！\nお前の運勢シャムゲーム！")
         else:
             return
         for i in syamu_message:
@@ -388,8 +394,7 @@ class Games(commands.Cog):
                     return False
 
             try:
-                msg = await self.bot.wait_for(
-                    'message', check=check_syamu, timeout=10)
+                msg = await self.bot.wait_for("message", check=check_syamu, timeout=10)
             except asyncio.TimeoutError:
                 return
             await ctx.send(i[msg.content])
