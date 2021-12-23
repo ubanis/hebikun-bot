@@ -12,35 +12,30 @@ import pandas as pd
 import util
 
 class HebiCommand:
-    """ hebi command class
     """
-    def __init__(self,name:str,
-                     pattern:str,
-                     function,
-                     desc:str):
+    Hebi command class
+    """
+    def __init__(self, name:str, pattern:str, function, desc:str):
         self.__name: str = name
         self.__pattern: str = pattern
         self.__function = function
         self.__description: str = desc
+
     @property
     def name(self) -> str:
-        """ command name
-        """
+        """str: command name"""
         return self.__name
     @property
     def pattern(self) -> str:
-        """ command matching pattern
-        """
+        """str: command matching pattern"""
         return self.__pattern
     @property
     def function(self):
-        """ command method pointer
-        """
+        """any: command method pointer"""
         return self.__function
     @property
     def description(self) -> str:
-        """ command description
-        """
+        """str: command description"""
         return self.__description
 
 class Hebi(commands.Cog):
@@ -110,7 +105,7 @@ class Hebi(commands.Cog):
                             http://weather.livedoor.com/forecast/rss/primary_area.xmldesc-kyle")
             ]
 
-    def get_command(self, command_str: str) -> Union[None,HebiCommand]:
+    def get_command(self, command_str: str) -> Union[None, HebiCommand]:
         """get a command dict from self.hebi_commands
 
         Args:
@@ -369,21 +364,25 @@ class Hebi(commands.Cog):
         command_error_message: str = 'HEBI_ERROR: hebi command error'
 
         try:
-            command2:Union[HebiCommand,None] = self.get_command(command_str)
-        except ValueError:
+            command2: Union[HebiCommand, None] = self.get_command(command_str)
+        except:
             print(command_error_message)
             return False
+
         if command2 is None:
             print(command_error_message)
             return False
+
         mob2 = re.search(command2.pattern, command_str)
+
         if mob2 is None:
             print(command_error_message)
             return False
+
         try:
             is_success = await command2.function(ctx, mob2)
-        except KeyError as e:
-            print(e)
+        except:
+            print(command_error_message)
             return False
 
         if is_success:
@@ -453,7 +452,7 @@ class Hebi(commands.Cog):
         if not await util.download_file(mob.group(1), temp_file, content):
             return False
 
-        image_type: Union[str,None] = imghdr.what(temp_file)
+        image_type: Union[str, None] = imghdr.what(temp_file)
         if image_type is None:
             return False
 
