@@ -121,7 +121,7 @@ class Hebi(commands.Cog):
         for l in self.command_list:
             if l.name == command_name:
                 return l
-        return None 
+        return None
 
     @commands.command()
     async def help(self, ctx):
