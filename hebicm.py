@@ -68,7 +68,8 @@ class Hebi(commands.Cog):
                                             _answer]
 
     def load_csv(self) -> bool:
-        """load csv file to pandas DataFrame
+        """
+        load csv file to pandas DataFrame
 
         Returns:
             bool: if load error has return False
@@ -83,10 +84,14 @@ class Hebi(commands.Cog):
         return True
 
     def set_hebi_commands(self):
-        """set self.hebi_commands dict
+        """
+        set self.hebi_commands dict
         """
         self.command_list = [
-                HebiCommand("base_command",r'(.*)\(.*\)',None,"このコマンドは利用できません"),
+                HebiCommand("base_command",
+                            r'(.*)\(.*\)',
+                            None,
+                            "このコマンドは利用できません"),
                 HebiCommand("send_file",
                             r'send_file\(\"(.*)\"\)',
                             self.bot_command_send_file,
@@ -117,7 +122,7 @@ class Hebi(commands.Cog):
             command_str (str): command string
 
         Returns:
-            HebiCommand or None 
+            HebiCommand or None
         """
         match_str = re.search( self.command_list[0].pattern,command_str)
         if match_str is None:
@@ -390,18 +395,14 @@ class Hebi(commands.Cog):
             print(command_error_message)
             return False
 
-        try:
-            is_success = await command2.function(ctx, mob2)
-        except:
-            print(command_error_message)
-            return False
+        is_success: bool = await command2.function(ctx, mob2)
 
         if is_success:
             print(command_str)
+            return True
         else:
             print(command_error_message)
             return False
-        return False
 
     async def bot_command_send_file(self, ctx, mob=None) -> bool:
         """send file command call from hebi_commands_run
