@@ -1,11 +1,14 @@
-from dropbox import Dropbox
 import os
+from dropbox import Dropbox
 
 DL_TOKEN = os.environ.get("DROPBOX_API_TOKEN")
 
 def upload_file(file_path):
     """
     upload file to dropbox
+    Args:
+        file_path(str):
+            file to path strings
     """
     dbx = Dropbox(DL_TOKEN)
     file_name = os.path.basename(file_path)
