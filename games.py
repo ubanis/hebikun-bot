@@ -397,10 +397,10 @@ class Games(commands.Cog):
             return
         for i in syamu_message:
 
-            def check_syamu(m):
-                if m.author == self.bot.user:
+            def check_syamu(mes_ctx):
+                if mes_ctx.author == self.bot.user:
                     return False
-                elif m.content in i:
+                elif mes_ctx.content in i:
                     return True
                 else:
                     return False
