@@ -1,6 +1,6 @@
 import asyncio
 import random
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from discord.ext import commands
 
@@ -17,6 +17,14 @@ class Games(commands.Cog):
 
     @commands.command()
     async def d(self, ctx, message):
+        """
+        Roll a dice(DnD)
+        Args:
+            self (Games): class self
+            ctx (Discord): discord context
+            message:
+                message from command user
+        """
         result = dice.nDn(message)
         if result is not None:
             await ctx.send(result)
@@ -24,6 +32,12 @@ class Games(commands.Cog):
 
     @commands.command()
     async def nkodice(self, ctx):
+        """
+        Roll a Nkodice
+        Args:
+            self (Games): class self
+            ctx (Discord): discord context
+        """
         nkodice: List[str] = ["う", "お", "こ", "ち", "ま", "ん"]
         current_dice = nkodice
         choice: str = ""
@@ -358,12 +372,10 @@ class Games(commands.Cog):
         await ctx.send(out_message)
 
     @commands.command()
-    async def omikuji(self, ctx):
+    async def omikuji(self, ctx) -> Union[bool,None]:
         """omikuji command
-
         Args:
             ctx (discord context): context
-
         Returns:
             bool: command result
         """
