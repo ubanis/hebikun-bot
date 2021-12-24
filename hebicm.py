@@ -39,6 +39,9 @@ class HebiCommand:
         return self.__description
 
 class Hebi(commands.Cog):
+    """
+    Hebi command class
+    """
     def __init__(self, bot):
         self._ask: str = 'ask'
         self._answer: str = 'answer'
@@ -71,8 +74,8 @@ class Hebi(commands.Cog):
         """
         try:
             self._df = pd.read_csv(self._csv_file, index_col=0)
-        except pd.io.common.EmptyDataError as e:
-            print(e)
+        except pd.io.common.EmptyDataError as error:
+            print(error)
             return False
         self._df.sort_values(self._ask, inplace=True)
         print(self._df.info())
@@ -114,13 +117,13 @@ class Hebi(commands.Cog):
         Returns:
             dict: one command dict or None
         """
-        m = re.search( self.command_list[0].pattern,command_str)
-        if m is None:
+        match_str = re.search( self.command_list[0].pattern,command_str)
+        if match_str is None:
             return None
-        command_name = m.group(1)
-        for l in self.command_list:
-            if l.name == command_name:
-                return l
+        command_name = match_str.group(1)
+        for cm_list in self.command_list:
+            if cm_list.name == command_name:
+                return cm_list
         return None
 
     @commands.command()
@@ -170,15 +173,15 @@ class Hebi(commands.Cog):
             ctx (discord context): context
         """
         dm_user = self.bot.get_user(ctx.message.author.id)
-        dm = await dm_user.create_dm()
+        dm_context = await dm_user.create_dm()
         embed = discord.Embed(title='メッセージで使えるコマンド一覧', color=0x26de12)
 
-        for l in self.command_list:
+        for cm_list in self.command_list:
             embed.add_field(
-                name=l.name,
-                value=l.description,
+                name=cm_list.name,
+                value=cm_list.description,
                 inline=False)
-        await dm.send(content=None, embed=embed)
+        await dm_context.send(content=None, embed=embed)
 
     @commands.command()
     async def setmes(self, ctx, *messages):
@@ -197,7 +200,7 @@ class Hebi(commands.Cog):
         command_strings: str = 'none'
 
         if mes_num == 4:
-            command_strings = '{0}(\"{1}\")'.format(messages[2], messages[3])
+            command_strings = f"{messages[2]}(\"{messages[3]}\")"
             if self.get_command(command_strings) is None:
                 await ctx.send(self._unknown_message)
                 return
@@ -253,6 +256,12 @@ class Hebi(commands.Cog):
 
     @commands.command()
     async def p(self, ctx):
+        """
+        List of drawpile login users
+        Args:
+            self (Hebi): self
+            ctx (Discord): Discord context
+        """
         url: str = "http://localhost:27780/api/sessions/"
         session_data = []
         output: str = '**Drawpileサーバーユーザー一覧**\n\n'
@@ -266,34 +275,34 @@ class Hebi(commands.Cog):
                     else:
                         await ctx.send(message)
                         return False
-        except aiohttp.InvalidURL as e:
-            print(e)
+        except aiohttp.InvalidURL as error:
+            print(error)
             return False
 
-        for d in api_data1:
-            title = d['title']
-            url = 'http://localhost:27780/api/sessions/{0}/'.format(d['id'])
+        for data in api_data1:
+            title = data['title']
+            url = 'http://localhost:27780/api/sessions/{0}/'.format(data['id'])
             session_data.append([title, url])
 
-        for sd in session_data:
+        for data in session_data:
             try:
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(sd[1]) as resp:
+                    async with session.get(data[1]) as resp:
                         if resp.status == 200:
                             api_data2 = await resp.json()
                         else:
                             await ctx.send(message)
                             return False
-            except aiohttp.InvalidURL as e:
-                print(e)
+            except aiohttp.InvalidURL as error:
+                print(error)
                 return False
 
-            output += '__{0}__\n'.format(sd[0])
-            for dd in api_data2['listings']:
-                output += '[roomcode: {0}]\n'.format(dd['roomcode'])
-            for dd in api_data2['users']:
-                if dd['online']:
-                    output += '{0}\n'.format(dd['name'])
+            output += '__{0}__\n'.format(data[0])
+            for room_data in api_data2['listings']:
+                output += '[roomcode: {0}]\n'.format(room_data['roomcode'])
+            for room_data in api_data2['users']:
+                if room_data['online']:
+                    output += '{0}\n'.format(room_data['name'])
             output += '\n'
 
         await ctx.send(output)
@@ -310,24 +319,24 @@ class Hebi(commands.Cog):
         """
         await ctx.send(self._what_message)
 
-        def check_hebi(m):
-            if m.author == self.bot.user or ctx.message.author != m.author:
+        def check_hebi(ch_mes):
+            if ch_mes.author == self.bot.user or ctx.message.author != ch_mes.author:
                 return False
-            elif m.content in self._df.index:
+            elif ch_mes.content in self._df.index:
                 return True
             else:
                 return False
 
         try:
-            msg = await self.bot.wait_for(
+            wait_msg = await self.bot.wait_for(
                 'message', check=check_hebi, timeout=20)
         except asyncio.TimeoutError:
             await ctx.send(self._timeout_message)
             return
 
-        await ctx.send(self._df.at[msg.content, self._answer])
+        await ctx.send(self._df.at[wait_msg.content, self._answer])
 
-        command_str = self._df.at[msg.content, self._command]
+        command_str = self._df.at[wait_msg.content, self._command]
         if command_str != "none":
             await self.hebi_commands_run(ctx, command_str)
 
@@ -351,7 +360,7 @@ class Hebi(commands.Cog):
         if command_str != 'none':
             await self.hebi_commands_run(ctx, command_str)
 
-    async def hebi_commands_run(self, ctx, command_str):
+    async def hebi_commands_run(self, ctx, command_str) -> bool:
         """hebi bot command execute
 
         Args:
@@ -363,11 +372,7 @@ class Hebi(commands.Cog):
         """
         command_error_message: str = 'HEBI_ERROR: hebi command error'
 
-        try:
-            command2: Union[HebiCommand, None] = self.get_command(command_str)
-        except:
-            print(command_error_message)
-            return False
+        command2: Union[HebiCommand, None] = self.get_command(command_str)
 
         if command2 is None:
             print(command_error_message)
@@ -390,8 +395,9 @@ class Hebi(commands.Cog):
         else:
             print(command_error_message)
             return False
+        return False
 
-    async def bot_command_send_file(self, ctx, mob=None):
+    async def bot_command_send_file(self, ctx, mob=None) -> bool:
         """send file command call from hebi_commands_run
 
         Args:
@@ -415,7 +421,7 @@ class Hebi(commands.Cog):
             print(send_file_not_found_message)
             return False
 
-    async def bot_command_send_url(self, ctx, mob=None):
+    async def bot_command_send_url(self, ctx, mob=None) -> bool:
         """send url message command call from hebi_commands_run
 
         Args:
@@ -456,17 +462,17 @@ class Hebi(commands.Cog):
         if image_type is None:
             return False
 
-        new_name: str = 'upload.{0}'.format(image_type)
+        new_name: str = f"upload.{image_type}"
         try:
             os.rename(temp_file, new_name)
             await ctx.send(file=discord.File(new_name))
             os.remove(new_name)
             return True
-        except OSError as e:
-            print(e)
+        except OSError as error:
+            print(error)
             return False
 
-    async def bot_command_weather(self, ctx, mob=None):
+    async def bot_command_weather(self, ctx, mob=None) -> bool:
         url = "http://weather.livedoor.com/forecast/webservice/json/v1?city={0}".format(
             mob.group(1))
         try:
@@ -476,16 +482,16 @@ class Hebi(commands.Cog):
                         api_data = await resp.json()
                     else:
                         return False
-        except aiohttp.InvalidURL as e:
-            print(e)
+        except aiohttp.InvalidURL as error:
+            print(error)
             return False
 
-        send_strings: str = '{0}\n'.format(api_data['title'])
+        send_strings: str = f"{api_data['title']}\n')"
 
         for weather in api_data['forecasts']:
             weather_date: str = weather['dateLabel']
             weather_fore_asts: str = weather['telop']
-            s: str = '{0} : {1}\n'.format(weather_date, weather_fore_asts)
+            s: str = f"{weather_date} : {weather_fore_asts}\n"
             send_strings += s
 
         send_strings += api_data['description']['text']
