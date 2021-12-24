@@ -1,15 +1,17 @@
-import aiohttp
-import os
-import re
-import json
-import pandas as pd
 import csv
+import json
+import os
 import pathlib
+import re
 from typing import List
 
+import aiohttp
+import pandas as pd
 
-def write_new_word_csv(df, csv_file):
-    """DataFrame write to csv and old csv backup
+
+def write_new_word_csv(data_frame: pd.DataFrame, csv_file: str) -> bool:
+    """
+    DataFrame write to csv and old csv backup
 
     Args:
         df (pandas DataFrame): pandas data frame
@@ -26,25 +28,25 @@ def write_new_word_csv(df, csv_file):
     if file_path_old.exists():
         try:
             os.remove(old_file)
-        except OSError as e:
-            print(e)
+        except OSError as error:
+            print(error)
             return False
 
     if file_path_csv.exists():
         try:
             os.rename(csv_file, old_file)
-        except OSError as e:
-            print(e)
+        except OSError as error:
+            print(error)
             return False
     try:
-        df.to_csv(csv_file)
+        data_frame.to_csv(csv_file)
         return True
-    except pd.io.common.EmptyDataError as e:
-        print(e)
+    except pd.io.common.EmptyDataError as error:
+        print(error)
         return False
 
 
-def write_word_csv_to_json(json_file, word_dict):
+def write_word_csv_to_json(json_file, word_dict) -> bool:
     """dict object write to json file
 
     Args:
@@ -56,11 +58,11 @@ def write_word_csv_to_json(json_file, word_dict):
     """
 
     try:
-        with open(json_file, 'w') as f:
-            json.dump(word_dict, f, ensure_ascii=False, indent=4)
+        with open(json_file, 'w', encoding="utf-8") as filep:
+            json.dump(word_dict, filep, ensure_ascii=False, indent=4)
             return True
-    except IOError as e:
-        print(e)
+    except IOError as error:
+        print(error)
         return False
 
 
@@ -76,16 +78,16 @@ def write_word_csv(new_strings: List[str], csv_file: str) -> bool:
     """
 
     try:
-        with open(csv_file, mode='a', newline="") as f:
-            writer = csv.writer(f, lineterminator='\n')
+        with open(csv_file, mode='a', newline="", encoding="utf-8") as filep:
+            writer = csv.writer(filep, lineterminator='\n')
             writer.writerow(new_strings)
         return True
-    except IOError as e:
-        print(e)
+    except IOError as error:
+        print(error)
         return False
 
 
-def get_files(target_dir_name, pattern='*'):
+def get_files(target_dir_name, pattern='*') -> List:
     """get a match files target directory with pattern
 
     Args:
@@ -101,7 +103,7 @@ def get_files(target_dir_name, pattern='*'):
     return files
 
 
-async def download_file(url, file_name, allowed_content):
+async def download_file(url, file_name, allowed_content) -> bool:
     """download file from the web
 
     Args:
@@ -118,10 +120,10 @@ async def download_file(url, file_name, allowed_content):
 
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as r:
-                if r.status == 200:
-                    download_file = await r.content.read()
-                    file_type = r.headers['Content-Type']
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    file_data = await resp.content.read()
+                    file_type = resp.headers['Content-Type']
                 else:
                     print(download_error_message)
                     return False
@@ -129,14 +131,14 @@ async def download_file(url, file_name, allowed_content):
                 print(invalid_file_message)
                 return False
             else:
-                with open(file_name, 'wb') as f:
-                    f.write(download_file)
+                with open(file_name, 'wb', encoding="utf-8") as filep:
+                    filep.write(file_data)
                 return True
-    except aiohttp.InvalidURL as e:
-        print(invalid_url_message, e)
+    except aiohttp.InvalidURL as error:
+        print(invalid_url_message, error)
         print(download_error_message)
         return False
-    except IOError as e:
-        print(e)
+    except IOError as error:
+        print(error)
         print(download_error_message)
         return False
