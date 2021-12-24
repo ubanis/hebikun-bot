@@ -1,14 +1,15 @@
-import pathlib
-import imghdr
-from typing import List
-from typing import Union
-import discord
-from discord.ext import commands
-import os
-import re
 import asyncio
+import imghdr
+import os
+import pathlib
+import re
+from typing import List, Union
+
 import aiohttp
+import discord
 import pandas as pd
+from discord.ext import commands
+
 import util
 
 class HebiCommand:
@@ -134,7 +135,7 @@ class Hebi(commands.Cog):
             ctx (discord context): context
         """
         dm_user = self.bot.get_user(ctx.message.author.id)
-        dm = await dm_user.create_dm()
+        dm_context = await dm_user.create_dm()
         embed = discord.Embed(title="コマンドのヘルプ", color=0x26de12)
         embed.add_field(name='!help', value='ヘルプ', inline=False)
         embed.add_field(name='!hebi', value='へびが20秒間コメントを待ちます', inline=False)
@@ -163,7 +164,7 @@ class Hebi(commands.Cog):
             value='空白を含む文章は \" \" で囲みましょう　\
                 そうしないとバラバラのメッセージと受け取られます',
             inline=False)
-        await dm.send(content=None, embed=embed)
+        await dm_context.send(content=None, embed=embed)
 
     @commands.command()
     async def listcommand(self, ctx):
@@ -281,7 +282,7 @@ class Hebi(commands.Cog):
 
         for data in api_data1:
             title = data['title']
-            url = 'http://localhost:27780/api/sessions/{0}/'.format(data['id'])
+            url = f"http://localhost:27780/api/sessions/{data['id']}/"
             session_data.append([title, url])
 
         for data in session_data:
@@ -297,13 +298,13 @@ class Hebi(commands.Cog):
                 print(error)
                 return False
 
-            output += '__{0}__\n'.format(data[0])
+            output += f"__{data[0]}__\n"
             for room_data in api_data2['listings']:
-                output += '[roomcode: {0}]\n'.format(room_data['roomcode'])
+                output += f"[roomcode: {room_data['roomcode']}]\n"
             for room_data in api_data2['users']:
                 if room_data['online']:
-                    output += '{0}\n'.format(room_data['name'])
-            output += '\n'
+                    output += f"{room_data['name']}\n"
+            output += "\n"
 
         await ctx.send(output)
 
@@ -473,8 +474,7 @@ class Hebi(commands.Cog):
             return False
 
     async def bot_command_weather(self, ctx, mob=None) -> bool:
-        url = "http://weather.livedoor.com/forecast/webservice/json/v1?city={0}".format(
-            mob.group(1))
+        url = f"http://weather.livedoor.com/forecast/webservice/json/v1?city={mob.group(1)}"
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
