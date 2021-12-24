@@ -44,17 +44,19 @@ class Hebi(commands.Cog):
     Hebi command class
     """
     def __init__(self, bot):
+        self.bot = bot
+        self._csv_file: str = "../data/hebi.csv"
+        self._df: pd.DataFrame = None
         self._ask: str = 'ask'
         self._answer: str = 'answer'
         self._command: str = 'command'
-        self._csv_file: str = "../data/hebi.csv"
-        self.bot = bot
-        self._df: pd.DataFrame = None
-
         self.command_list = []
+
         self.load_csv()
         self.set_hebi_commands()
+        self.set_messages()
 
+    def set_messages(self):
         self._timeout_message: str = self._df.at['@timeout_message', self._answer]
         self._what_message: str = self._df.at['@what_message', self._answer]
         self._learn_message: str = self._df.at['@learn_message', self._answer]
