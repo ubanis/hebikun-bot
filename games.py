@@ -68,7 +68,7 @@ class Games(commands.Cog):
         while roll_count < roll:
             nko_round += 1
             result += str(nko_round) + ": "
-            for i in range(dice_num):
+            for _ in range(dice_num):
                 choice = random.choice(current_dice)
                 result += choice
 
