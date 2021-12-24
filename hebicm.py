@@ -497,8 +497,8 @@ class Hebi(commands.Cog):
         for weather in api_data['forecasts']:
             weather_date: str = weather['dateLabel']
             weather_fore_asts: str = weather['telop']
-            s: str = f"{weather_date} : {weather_fore_asts}\n"
-            send_strings += s
+            output_weather: str = f"{weather_date} : {weather_fore_asts}\n"
+            send_strings += output_weather
 
         send_strings += api_data['description']['text']
         await ctx.send(send_strings)
