@@ -67,7 +67,7 @@ class Hebi(commands.Cog):
         self._unknown_message: str = self._df.at['@unknown_command_message', self.
                                             _answer]
 
-    def load_csv(self):
+    def load_csv(self) -> bool:
         """load csv file to pandas DataFrame
 
         Returns:
@@ -80,6 +80,7 @@ class Hebi(commands.Cog):
             return False
         self._df.sort_values(self._ask, inplace=True)
         print(self._df.info())
+        return True
 
     def set_hebi_commands(self):
         """set self.hebi_commands dict
@@ -116,7 +117,7 @@ class Hebi(commands.Cog):
             command_str (str): command string
 
         Returns:
-            dict: one command dict or None
+            HebiCommand or None 
         """
         match_str = re.search( self.command_list[0].pattern,command_str)
         if match_str is None:
@@ -179,9 +180,9 @@ class Hebi(commands.Cog):
 
         for cm_list in self.command_list:
             embed.add_field(
-                name=cm_list.name,
-                value=cm_list.description,
-                inline=False)
+                name = cm_list.name,
+                value = cm_list.description,
+                inline = False)
         await dm_context.send(content=None, embed=embed)
 
     @commands.command()
@@ -256,12 +257,14 @@ class Hebi(commands.Cog):
         return
 
     @commands.command()
-    async def p(self, ctx):
+    async def p(self, ctx) -> bool:
         """
         List of drawpile login users
         Args:
             self (Hebi): self
             ctx (Discord): Discord context
+        Returns:
+            command success
         """
         url: str = "http://localhost:27780/api/sessions/"
         session_data = []
@@ -307,9 +310,10 @@ class Hebi(commands.Cog):
             output += "\n"
 
         await ctx.send(output)
+        return True
 
     @commands.command()
-    async def hebi(self, ctx):
+    async def hebi(self, ctx) -> bool:
         """bot wait for message until 20 seconds
 
         Args:
@@ -333,13 +337,14 @@ class Hebi(commands.Cog):
                 'message', check=check_hebi, timeout=20)
         except asyncio.TimeoutError:
             await ctx.send(self._timeout_message)
-            return
+            return False
 
         await ctx.send(self._df.at[wait_msg.content, self._answer])
 
         command_str = self._df.at[wait_msg.content, self._command]
         if command_str != "none":
             await self.hebi_commands_run(ctx, command_str)
+        return True
 
     @commands.command()
     async def h(self, ctx, *, message=' '):
@@ -437,7 +442,7 @@ class Hebi(commands.Cog):
         await ctx.send(mob.group(1))
         return True
 
-    async def bot_command_open_url_image(self, ctx, mob=None):
+    async def bot_command_open_url_image(self, ctx, mob=None) -> bool:
         """download image from url then send a file
         command call from hebi_commands_run
 
