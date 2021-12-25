@@ -1,3 +1,4 @@
+""" Hebikun Discord bot """
 import os
 from discord.ext import commands
 

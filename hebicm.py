@@ -1,3 +1,4 @@
+""" Discord Hebibot command module """
 import asyncio
 import imghdr
 import os

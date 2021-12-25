@@ -1,3 +1,4 @@
+""" Discord Hebi Listener module """
 import imghdr
 import os
 import re

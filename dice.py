@@ -1,3 +1,4 @@
+""" DnD dice module """
 import random
 import re
 
