@@ -13,6 +13,7 @@ from discord.ext import commands
 
 import util
 
+
 class HebiCommand:
     """
     Hebi command class

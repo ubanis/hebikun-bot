@@ -4,7 +4,7 @@ import json
 import os
 import pathlib
 import re
-from typing import List
+from typing import List, Dict
 
 import aiohttp
 import pandas as pd
@@ -47,7 +47,7 @@ def write_new_word_csv(data_frame: pd.DataFrame, csv_file: str) -> bool:
         return False
 
 
-def write_word_csv_to_json(json_file, word_dict) -> bool:
+def write_word_csv_to_json(json_file: str, word_dict: Dict) -> bool:
     """dict object write to json file
 
     Args:
@@ -88,7 +88,7 @@ def write_word_csv(new_strings: List[str], csv_file: str) -> bool:
         return False
 
 
-def get_files(target_dir_name, pattern='*') -> List:
+def get_files(target_dir_name: str, pattern='*') -> List:
     """get a match files target directory with pattern
 
     Args:
@@ -104,7 +104,7 @@ def get_files(target_dir_name, pattern='*') -> List:
     return files
 
 
-async def download_file(url, file_name, allowed_content) -> bool:
+async def download_file(url: str, file_name: str, allowed_content: Dict) -> bool:
     """download file from the web
 
     Args:
@@ -143,3 +143,4 @@ async def download_file(url, file_name, allowed_content) -> bool:
         print(error)
         print(download_error_message)
         return False
+
