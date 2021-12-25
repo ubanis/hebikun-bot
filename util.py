@@ -132,7 +132,7 @@ async def download_file(url: str, file_name: str, allowed_content: Dict) -> bool
                 print(invalid_file_message)
                 return False
             else:
-                with open(file_name, 'wb', encoding="utf-8") as filep:
+                with open(file_name, 'wb') as filep:
                     filep.write(file_data)
                 return True
     except aiohttp.InvalidURL as error:
