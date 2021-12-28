@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+py-cord = "*"
+pandas = "*"
+dropbox = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"

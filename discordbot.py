@@ -1,4 +1,4 @@
-""" Hebikun Discord bot """
+""" Hebikun Discord bot py-cord version """
 import os
 from discord.ext import commands
 
@@ -6,12 +6,13 @@ import hebicm as hebi_commands
 import hebilistener as hebi_listener
 import games as hebi_games
 
-bot = commands.Bot(command_prefix='!')
-bot.remove_command('help')
+client = commands.Bot(command_prefix='!')
+client.remove_command('help')
 
-bot.add_cog(hebi_commands.Hebi(bot))
-bot.add_cog(hebi_listener.HebiListener(bot))
-bot.add_cog(hebi_games.Games(bot))
+client.add_cog(hebi_commands.Hebi(client))
+client.add_cog(hebi_listener.HebiListener(client))
+client.add_cog(hebi_games.Games(client))
+
 
 TOKEN = os.environ.get("DISCORDBOT_API_TOKEN")
-bot.run(TOKEN)
+client.run(TOKEN)
