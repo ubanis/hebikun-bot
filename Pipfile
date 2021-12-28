@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-py-cord = "*"
 pandas = "*"
 dropbox = "*"
+py-cord = {git = "https://github.com/Pycord-Development/pycord.git"}
 
 [dev-packages]
 

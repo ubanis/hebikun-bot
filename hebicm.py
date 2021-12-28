@@ -10,6 +10,7 @@ import aiohttp
 import discord
 import pandas as pd
 from discord.ext import commands
+from discord.commands import Option, slash_command
 
 import util
 
@@ -47,6 +48,7 @@ class Hebi(commands.Cog):
     """
     def __init__(self, bot):
         self.bot = bot
+        
         self._csv_file: str = "../data/hebi.csv"
         self._df: pd.DataFrame = None
         self._ask: str = 'ask'
@@ -136,6 +138,41 @@ class Hebi(commands.Cog):
             if cm_list.name == command_name:
                 return cm_list
         return None
+
+    @slash_command(guild_ids=[317649332125827072])
+    async def setmestest(
+        ctx,
+        ask: Option(str, '質問'),
+        answer: Option(str, '答え'),
+        command: Option(str, 'コマンド', choices=['none', 'test1', 'test2', 'test3'], default='none'),
+        value: Option(str, 'コマンド引数', default='none'),
+    ):
+        await ctx.send(f"送信されたデータ name{ask} answer{answer} command{command} value{value}")
+
+    @slash_command(guild_ids=[317649332125827072])
+    async def hi(self, ctx):
+        await ctx.respond("Hi, this is a global slash command from a cog!")
+
+    @slash_command(guild_ids=[317649332125827072])
+    async def h2(self, ctx, message: Option(str, 'メッセージ',default=' ')):
+        """send a message to bot
+
+        Args:
+            ctx (discord context): context
+            message (str, optional): Defaults to ' '. message to bot
+        """
+        if message == ' ':
+            return
+
+        if message not in self._df.index:
+            return
+
+        await ctx.respond(self._df.at[message, self._answer])
+        command_str = self._df.at[message, self._command]
+
+        if command_str != 'none':
+            await self.hebi_commands_run(ctx, command_str)
+
 
     @commands.command()
     async def help(self, ctx):
