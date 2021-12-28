@@ -14,7 +14,8 @@ from discord.commands import Option, slash_command
 
 import util
 
-
+GUILD_ID = 317649332125827072
+COMMAND_NAME_LIST = ["none", "send_file", "open_url_image", "send_url", "weather"]
 class HebiCommand:
     """
     Hebi command class
@@ -93,6 +94,7 @@ class Hebi(commands.Cog):
         """
         set self.hebi_commands dict
         """
+        
         self.command_list = [
                 HebiCommand("base_command",
                             r'(.*)\(.*\)',
@@ -139,32 +141,52 @@ class Hebi(commands.Cog):
                 return cm_list
         return None
 
-    @slash_command(guild_ids=[317649332125827072])
-    async def setmestest(
+    @slash_command(name='setmes', description='コマンドやメッセージを設定します。既存のものがある場合は上書きされます。', guild_ids=[GUILD_ID])
+    async def slash_setmes(
+        self,
         ctx,
-        ask: Option(str, '質問'),
-        answer: Option(str, '答え'),
-        command: Option(str, 'コマンド', choices=['none', 'test1', 'test2', 'test3'], default='none'),
-        value: Option(str, 'コマンド引数', default='none'),
+        ask: Option(str, '質問の単語を入力します'),
+        answer: Option(str, '答えを入力します'),
+        command: Option(str, 'コマンドは一覧から選んでください 必要ない場合は none を選んでください', choices=COMMAND_NAME_LIST),
+        value: Option(str, 'コマンドの引数です コマンドが none の場合は何を入れても問題は起こりません',choices=["none"], default="none"),
     ):
-        await ctx.send(f"送信されたデータ name{ask} answer{answer} command{command} value{value}")
+        if command == "none":
+            command_strings: str = 'none'
+        else:
+            command_strings: str = f"{command}(\"{value}\")"
+            if self.get_command(command_strings) is None:
+                await ctx.respond(self._unknown_message)
+                return
 
-    @slash_command(guild_ids=[317649332125827072])
-    async def hi(self, ctx):
-        await ctx.respond("Hi, this is a global slash command from a cog!")
+        new_strings: List[str] = [ask, answer, command_strings]
 
-    @slash_command(guild_ids=[317649332125827072])
-    async def h2(self, ctx, message: Option(str, 'メッセージ',default=' ')):
-        """send a message to bot
+        if ask in self._df.index:
+            self._df.loc[new_strings[0]] = [new_strings[1], new_strings[2]]
+            if util.write_new_word_csv(self._df, self._csv_file):
+                await ctx.respond(self._chmes_success_message)
+            else:
+                await ctx.respond(self._chmes_fail_message)
+            return
+        else:
+            if util.write_word_csv(new_strings, self._csv_file):
+                self._df.loc[new_strings[0]] = [new_strings[1], new_strings[2]]
+                await ctx.respond(self._learn_message)
+            return
+
+    @slash_command(name='h', description='へびくんが答えます', guild_ids=[GUILD_ID])
+    async def slash_h(self, ctx, message: Option(str, 'メッセージ', default=' ')):
+        """send a message to bot with slash command
 
         Args:
             ctx (discord context): context
-            message (str, optional): Defaults to ' '. message to bot
+            message (Option str): Defaults to ' '. message to bot
         """
         if message == ' ':
+            await ctx.respond("メッセージがからっぽです")
             return
 
         if message not in self._df.index:
+            await ctx.respond("その言葉は登録されていないようです /setmes で登録しましょう！")
             return
 
         await ctx.respond(self._df.at[message, self._answer])
@@ -356,6 +378,63 @@ class Hebi(commands.Cog):
             output += "\n"
 
         await ctx.send(output)
+        return True
+
+
+    @slash_command(name='p', description='現在Drawpileに誰がログインしているか表示します', guild_ids=[GUILD_ID])
+    async def slash_p(self, ctx) -> bool:
+        """
+        display list of drawpile login users with slash command
+        Args:
+            self (Hebi): self
+            ctx (Discord): Discord context
+        Returns:
+            command success
+        """
+        url: str = "http://localhost:27780/api/sessions/"
+        session_data = []
+        output: str = '**Drawpileサーバーユーザー一覧**\n\n'
+        message: str = 'Drawpileサーバーからの応答なし'
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    if resp.status == 200:
+                        api_data1 = await resp.json()
+                    else:
+                        await ctx.respond(message)
+                        return False
+        except aiohttp.InvalidURL as error:
+            print(error)
+            return False
+
+        for data in api_data1:
+            title = data['title']
+            url = f"http://localhost:27780/api/sessions/{data['id']}/"
+            session_data.append([title, url])
+
+        for data in session_data:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(data[1]) as resp:
+                        if resp.status == 200:
+                            api_data2 = await resp.json()
+                        else:
+                            await ctx.respond(message)
+                            return False
+            except aiohttp.InvalidURL as error:
+                print(error)
+                return False
+
+            output += f"__{data[0]}__\n"
+            for room_data in api_data2['listings']:
+                output += f"[roomcode: {room_data['roomcode']}]\n"
+            for room_data in api_data2['users']:
+                if room_data['online']:
+                    output += f"{room_data['name']}\n"
+            output += "\n"
+
+        await ctx.respond(output)
         return True
 
     @commands.command()
