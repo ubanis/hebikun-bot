@@ -65,7 +65,7 @@ class Games(commands.Cog):
             self (Games): class self
             ctx (Discord): discord context
         """
-        await ctx.respond(nkodice.nkodice_main())
+        await ctx.send(nkodice.nkodice_main())
 
     @slash_command(name='omikuji', description='おみくじをします', guild_ids=[GUILD_ID])
     async def slash_omikuji(self, ctx) -> Union[bool,None]:
