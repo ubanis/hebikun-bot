@@ -186,10 +186,10 @@ class Hebi(commands.Cog):
             return
 
         if message not in self._df.index:
-            await ctx.respond("その言葉は登録されていないようです /setmes で登録しましょう！")
+            await ctx.respond(f"[{message}]:その言葉は登録されていないようです /setmes で登録しましょう！")
             return
 
-        await ctx.respond(self._df.at[message, self._answer])
+        await ctx.respond(f"[{message}]: " + self._df.at[message, self._answer])
         command_str = self._df.at[message, self._command]
 
         if command_str != 'none':
