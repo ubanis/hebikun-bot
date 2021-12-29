@@ -148,7 +148,7 @@ class Hebi(commands.Cog):
         ask: Option(str, '質問の単語を入力します'),
         answer: Option(str, '答えを入力します'),
         command: Option(str, 'コマンドは一覧から選んでください 必要ない場合は none を選んでください', choices=COMMAND_NAME_LIST),
-        value: Option(str, 'コマンドの引数です コマンドが none の場合は何を入れても問題は起こりません',choices=["none"], default="none"),
+        value: Option(str, 'コマンドの引数です コマンドが none の場合は何を入れても問題は起こりません', default="none"),
     ):
         if command == "none":
             command_strings: str = 'none'
